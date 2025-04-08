@@ -1,9 +1,9 @@
 /*
- * 手语翻译手套 - 数字手势识别程序(one-five)
+ * 手语翻译手套 - 手势识别程序(one-five & love)
  * 
  * 功能:
  * 1. 使用校准的ADC值读取弯曲传感器和IMU数据
- * 2. 使用Edge Impulse导出的模型识别数字手势one-five
+ * 2. 使用Edge Impulse导出的模型识别数字和特殊手势
  * 3. 在串口显示识别结果
  * 
  * 使用方法:
@@ -24,18 +24,19 @@
 #define FLEX_PIN_RING A3
 #define FLEX_PIN_PINKY A4
 
-// 弯曲传感器校准值 - 使用之前校准程序获得的值
-const int FLEX_THUMB_STRAIGHT_ADC = 340;
-const int FLEX_INDEX_STRAIGHT_ADC = 280;
-const int FLEX_MIDDLE_STRAIGHT_ADC = 405;
-const int FLEX_RING_STRAIGHT_ADC = 390;
-const int FLEX_PINKY_STRAIGHT_ADC = 390;
+// 弯曲传感器校准值 - 平放状态ADC值(STRAIGHT_ADC)
+const int FLEX_THUMB_STRAIGHT_ADC = 330;    // 替换为您的实际值
+const int FLEX_INDEX_STRAIGHT_ADC = 440;    // 替换为您的实际值
+const int FLEX_MIDDLE_STRAIGHT_ADC = 400;   // 替换为您的实际值
+const int FLEX_RING_STRAIGHT_ADC = 430;     // 替换为您的实际值
+const int FLEX_PINKY_STRAIGHT_ADC = 390;    // 替换为您的实际值
 
-const int FLEX_THUMB_BENT_ADC = 240;
-const int FLEX_INDEX_BENT_ADC = 240;
-const int FLEX_MIDDLE_BENT_ADC = 360;
-const int FLEX_RING_BENT_ADC = 345;
-const int FLEX_PINKY_BENT_ADC = 335;
+// 弯曲传感器校准值 - 最大弯曲状态ADC值(BENT_ADC)
+const int FLEX_THUMB_BENT_ADC = 220;    // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
+const int FLEX_INDEX_BENT_ADC = 360;    // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
+const int FLEX_MIDDLE_BENT_ADC = 320;   // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
+const int FLEX_RING_BENT_ADC = 335;     // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
+const int FLEX_PINKY_BENT_ADC = 320;    // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
 
 // 整合到数组中方便处理
 const int FLEX_STRAIGHT_ADC[5] = {
@@ -55,11 +56,11 @@ const int FLEX_BENT_ADC[5] = {
 };
 
 // 采样与推理配置
-#define INFERENCE_INTERVAL_MS   300  // 每300ms进行一次推理(对数字手势适当加快响应)
-#define CONFIDENCE_THRESHOLD    0.60 // 识别置信度阈值(0.0-1.0)，数字手势可以稍低
+#define INFERENCE_INTERVAL_MS   300  // 每300ms进行一次推理
+#define CONFIDENCE_THRESHOLD    0.60 // 识别置信度阈值(0.0-1.0)
 
 // 滤波参数
-const float ALPHA = 0.3;  // 低通滤波系数(稍微提高以加快响应)
+const float ALPHA = 0.3;  // 低通滤波系数
 
 // 存储滤波后的传感器值
 float filteredFlexValues[5] = {0};
@@ -77,14 +78,15 @@ String lastRecognizedGesture = "";
 int stableCount = 0;  // 稳定计数器，用于减少识别抖动
 int noGestureCount = 0; // 计数器，用于检测没有手势的状态
 
-// 手势标签和描述 - 使用小写英文单词标签
-const char* GESTURE_LABELS[] = {"one", "two", "three", "four", "five"};
-const char* DIGIT_DESCRIPTIONS[] = {
+// 手势标签和描述
+const char* GESTURE_LABELS[] = {"one", "two", "three", "four", "five", "love"};
+const char* GESTURE_DESCRIPTIONS[] = {
   "数字1 (食指伸出)",
   "数字2 (食指和中指伸出)",
   "数字3 (拇指、食指和中指伸出)",
   "数字4 (四指伸出，拇指收起)",
-  "数字5 (五指全部伸开)"
+  "数字5 (五指全部伸开)",
+  "爱心手势 (拇指和食指伸出成心形)"
 };
 
 // 定义静态回调函数用于获取特征数据
@@ -183,20 +185,22 @@ void prepareFeatures() {
 }
 
 /**
- * @brief 获取数字手势的友好描述
+ * @brief 获取手势的友好描述
  */
 const char* getGestureDescription(const char* label) {
   // 判断是否为预定义的手势，并返回对应描述
   if (strcmp(label, "one") == 0) {
-    return DIGIT_DESCRIPTIONS[0];
+    return GESTURE_DESCRIPTIONS[0];
   } else if (strcmp(label, "two") == 0) {
-    return DIGIT_DESCRIPTIONS[1];
+    return GESTURE_DESCRIPTIONS[1];
   } else if (strcmp(label, "three") == 0) {
-    return DIGIT_DESCRIPTIONS[2];
+    return GESTURE_DESCRIPTIONS[2];
   } else if (strcmp(label, "four") == 0) {
-    return DIGIT_DESCRIPTIONS[3];
+    return GESTURE_DESCRIPTIONS[3];
   } else if (strcmp(label, "five") == 0) {
-    return DIGIT_DESCRIPTIONS[4];
+    return GESTURE_DESCRIPTIONS[4];
+  } else if (strcmp(label, "love") == 0) {
+    return GESTURE_DESCRIPTIONS[5];
   } else {
     // 如果不是已知手势，返回原始标签
     return label;
@@ -233,24 +237,12 @@ void runInference() {
         maxIndex = i;
       }
     }
-
-
-    // 在上面代码后面添加这段调试输出代码:
-    Serial.println("\n所有手势的置信度:");
-    for (size_t i = 0; i < EI_CLASSIFIER_LABEL_COUNT; i++) {
-      Serial.print("  ");
-      Serial.print(ei_classifier_inferencing_categories[i]);
-      Serial.print(": ");
-      Serial.print(result.classification[i].value * 100, 1); // 保留一位小数
-      Serial.println("%");
-    }
-    Serial.println("---------------------------");
     
     // 超过置信度阈值才认为是有效手势
     if (maxScore > CONFIDENCE_THRESHOLD) {
       String gesture = String(result.classification[maxIndex].label);
       
-      // 连续识别同一手势2次后才输出结果 (数字手势可以降低至2次)
+      // 连续识别同一手势2次后才输出结果
       if (gesture == lastRecognizedGesture) {
         stableCount++;
         if (stableCount >= 2 && stableCount % 2 == 0) {  // 每2次稳定更新输出一次
@@ -346,17 +338,17 @@ void printGestureList() {
   Serial.println("\n支持的手势列表:");
   
   // 手动列出所有标签及其描述
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 6; i++) {  // 更新为6个手势
     Serial.print("  ");
     Serial.print(i + 1);
     Serial.print(". ");
     Serial.print(GESTURE_LABELS[i]);
     Serial.print(" - ");
-    Serial.println(DIGIT_DESCRIPTIONS[i]);
+    Serial.println(GESTURE_DESCRIPTIONS[i]);
   }
   
-  // 如果还有其他标签(以防万一模型中有额外标签)
-  for (size_t i = 5; i < EI_CLASSIFIER_LABEL_COUNT; i++) {
+  // 如果还有其他标签(以防模型中有额外标签)
+  for (size_t i = 6; i < EI_CLASSIFIER_LABEL_COUNT; i++) {
     Serial.print("  ");
     Serial.print(i + 1);
     Serial.print(". ");
@@ -387,7 +379,7 @@ void setup() {
   }
   
   Serial.println("==================================================");
-  Serial.println("|    手语翻译手套 - 数字手势识别程序(one-five)   |");
+  Serial.println("|      手语翻译手套 - 手势识别程序              |");
   Serial.println("==================================================");
   Serial.println("\nIMU初始化成功");
   Serial.print("加速度计采样率: ");
@@ -415,7 +407,7 @@ void setup() {
     delay(10);
   }
   
-  Serial.println("\n准备就绪，开始识别数字手势(one-five)...");
+  Serial.println("\n准备就绪，开始识别手势...");
   Serial.println("--------------------------------------------------");
   Serial.println("命令菜单:");
   Serial.println("  info - 显示当前传感器数据");
@@ -482,7 +474,6 @@ void loop() {
     
     // 运行推理并处理结果
     runInference();
-    delay(500);
   }
   
   // 处理来自串口的命令

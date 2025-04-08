@@ -29,18 +29,18 @@
 // 【重要】替换为校准程序获得的ADC上下限值
 // ===============================================================
 // 弯曲传感器校准值 - 平放状态ADC值(STRAIGHT_ADC)
-const int FLEX_THUMB_STRAIGHT_ADC = 340;    // 替换为您的实际值
-const int FLEX_INDEX_STRAIGHT_ADC = 280;    // 替换为您的实际值
-const int FLEX_MIDDLE_STRAIGHT_ADC = 405;   // 替换为您的实际值
-const int FLEX_RING_STRAIGHT_ADC = 390;     // 替换为您的实际值
+const int FLEX_THUMB_STRAIGHT_ADC = 330;    // 替换为您的实际值
+const int FLEX_INDEX_STRAIGHT_ADC = 440;    // 替换为您的实际值
+const int FLEX_MIDDLE_STRAIGHT_ADC = 400;   // 替换为您的实际值
+const int FLEX_RING_STRAIGHT_ADC = 430;     // 替换为您的实际值
 const int FLEX_PINKY_STRAIGHT_ADC = 390;    // 替换为您的实际值
 
 // 弯曲传感器校准值 - 最大弯曲状态ADC值(BENT_ADC)
-const int FLEX_THUMB_BENT_ADC = 240;    // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
-const int FLEX_INDEX_BENT_ADC = 220;    // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
-const int FLEX_MIDDLE_BENT_ADC = 360;   // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
-const int FLEX_RING_BENT_ADC = 345;     // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
-const int FLEX_PINKY_BENT_ADC = 335;    // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
+const int FLEX_THUMB_BENT_ADC = 220;    // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
+const int FLEX_INDEX_BENT_ADC = 360;    // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
+const int FLEX_MIDDLE_BENT_ADC = 320;   // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
+const int FLEX_RING_BENT_ADC = 335;     // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
+const int FLEX_PINKY_BENT_ADC = 320;    // 替换为您的实际值 - 注意这里假设弯曲时ADC值减小
 // ===============================================================
 
 // 整合到数组中方便处理
