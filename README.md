@@ -1,5 +1,5 @@
 ---
-typora-root-url: ./img
+typora-root-url: ./
 ---
 
 # CASA0018-Gloves-Edge-AI
@@ -12,7 +12,7 @@ This project implements a wearable device that translates sign language gestures
 
 The Sign Language Recognition Glove aims to develop a wearable device that translates sign language by recognizing hand positions in real-time. This device uses flex sensors to detect finger bending and an IMU to capture hand orientation, enabling it to recognize specific sign language gestures. The system processes this data using a machine learning model deployed directly on an Arduino microcontroller, providing immediate feedback through an LCD display.
 
-<img src="/love.jpg" alt="love" style="zoom:10%;" />
+<img src="/img/love.jpg" alt="love" style="zoom:10%;" />
 
 ### Features
 
@@ -112,15 +112,15 @@ The model was trained using Edge Impulse with the following workflow:
 4. Model optimization for embedded deployment
 5. Quantization to reduce model size and improve inference speed
 
-![Collected Data](/Collected Data.jpg)
+![Collected Data](/img/Collected Data.jpg)
 
-![Flatten](/Flatten.jpg)
+![Flatten](/img/Flatten.jpg)
 
-![Classifer NNS](/Classifer NNS.jpg)
+![Classifer NNS](/img/Classifer NNS.jpg)
 
-![Test Data](/Test Data.jpg)
+![Test Data](/img/Test Data.jpg)
 
-![Quantized](/Quantized.jpg)
+![Quantized](/img/Quantized.jpg)
 
 ## Calibration
 
@@ -155,6 +155,8 @@ The system:
 - Updates LCD every 200ms
 - Uses a confidence threshold of 0.60 for gesture detection
 - Implements stability detection to prevent jitter in recognition results
+
+<img src="/img/love example.jpg" alt="love example" style="zoom:25%;" />
 
 ## Troubleshooting
 
