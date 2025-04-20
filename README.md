@@ -107,20 +107,26 @@ The system is organized into several modular components (`Sign_Language_Recognit
 The model was trained using Edge Impulse with the following workflow:
 
 1. Data collection using the same hardware setup
+
+   <img src="/img/Collected Data.jpg" alt="Collected Data" style="zoom:15%;" />
+
 2. Feature extraction: 7 statistical features (mean, min, max, RMS, StdDev, skewness, kurtosis) for each sensor
+
+   <img src="/img/Flatten.jpg" alt="Flatten" style="zoom:15%;" />
+
 3. Neural network training with several dense layers
-4. Model optimization for embedded deployment
+
+   <img src="/img/Classifer NNS.jpg" alt="Classifer NNS" style="zoom:18%;" />
+
+4. Model optimization
+
+   ![versions](/img/versions.jpg)
+
 5. Quantization to reduce model size and improve inference speed
 
-![Collected Data](/img/Collected Data.jpg)
+   ![Quantized](/img/Quantized.jpg)
 
-![Flatten](/img/Flatten.jpg)
 
-![Classifer NNS](/img/Classifer NNS.jpg)
-
-![Test Data](/img/Test Data.jpg)
-
-![Quantized](/img/Quantized.jpg)
 
 ## Calibration
 
